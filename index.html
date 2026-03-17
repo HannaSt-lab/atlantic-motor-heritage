@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Atlantic Motor Heritage — European Collector Cars</title>
+  <meta name="description" content="European collector cars sourced in Portugal and delivered worldwide. Classic Porsche and rare European sports cars for discerning collectors.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --charcoal: #1a1a1a;
+      --charcoal-card: #212121;
+      --charcoal-elevated: #252525;
+      --gold: #B8935A;
+      --gold-light: #cfa96e;
+      --burgundy: #8C1D2D;
+      --burgundy-hover: #a62235;
+      --ivory: #F4F1E8;
+      --ivory-dim: rgba(244,241,232,0.58);
+      --green-deep: #0c2218;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background-color: var(--charcoal);
+      color: var(--ivory);
+      font-family: 'Inter', sans-serif;
+      font-weight: 300;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 9999;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 200px;
+    }
+
+    /* NAV */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+      padding: 1.75rem 3.5rem;
+      display: flex; align-items: center; justify-content: space-between;
+      transition: background-color 0.5s ease, padding 0.4s ease, border-color 0.5s ease;
+      border-bottom: 1px solid transparent;
+    }
+    .nav.scrolled {
+      background: rgba(22,22,22,0.96);
+      backdrop-filter: blur(12px);
+      padding: 1rem 3.5rem;
+      border-bottom-color: rgba(184,147,90,0.18);
+    }
+    .nav-logo { height: 46px; width: auto; transition: height 0.4s ease; display: block; }
+    .nav.scrolled .nav-logo { height: 38px; }
+    .nav-brand { display: flex; align-items: center; gap: 0.85rem; text-decoration: none; }
+    .nav-brand-text { display: flex; flex-direction: column; }
+    .nav-brand-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.95rem; font-weight: 600;
+      letter-spacing: 0.04em; color: var(--ivory);
+      line-height: 1.1;
+    }
+    .nav-brand-tagline {
+      font-size: 0.55rem; font-weight: 400;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--gold);
+    }
+    .nav-links { display: flex; align-items: center; gap: 2.75rem; list-style: none; }
+    .nav-links a {
+      font-size: 0.7rem; font-weight: 500; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--ivory-dim); text-decoration: none;
+      position: relative; transition: color 0.3s ease;
+    }
+    .nav-links a::after {
+      content: ''; position: absolute; bottom: -4px; left: 0;
+      width: 0; height: 1px; background: var(--gold);
+      transition: width 0.35s ease;
+    }
+    .nav-links a:hover { color: var(--ivory); }
+    .nav-links a:hover::after { width: 100%; }
+    .nav-links a:focus-visible { outline: 1px solid var(--gold); outline-offset: 5px; }
+    .nav-contact {
+      padding: 0.5rem 1.35rem;
+      border: 1px solid rgba(184,147,90,0.5);
+      color: var(--gold) !important;
+      transition: background-color 0.3s ease, color 0.3s ease !important;
+    }
+    .nav-contact:hover { background: var(--gold) !important; color: var(--charcoal) !important; }
+    .nav-contact::after { display: none !important; }
+    .nav-contact:focus-visible { outline: 1px solid var(--gold); outline-offset: 5px; }
+
+    /* HERO */
+    .hero {
+      position: relative; height: 100vh; min-height: 640px;
+      display: flex; align-items: center; justify-content: center; overflow: hidden;
+    }
+    .hero-video {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      object-fit: cover; opacity: 0; transition: opacity 1.8s ease;
+      /* cinematic color grade: slightly desaturated, warmer blacks */
+      filter: saturate(0.85) contrast(1.08) brightness(0.95);
+    }
+    .hero-video.ready { opacity: 1; }
+    .hero-fallback {
+      position: absolute; inset: 0; z-index: 0;
+      background: linear-gradient(135deg, #0c2218 0%, #1a1a1a 55%, #2a1a0e 100%);
+    }
+    /* cinematic warm amber grade layer */
+    .hero-grade {
+      position: absolute; inset: 0; z-index: 1; pointer-events: none;
+      background: rgba(160, 100, 30, 0.10);
+      mix-blend-mode: soft-light;
+    }
+    /* primary overlay: dramatic top+bottom fade */
+    .hero-overlay {
+      position: absolute; inset: 0; z-index: 1;
+      background:
+        linear-gradient(to bottom,
+          rgba(8,6,4,0.55) 0%,
+          rgba(8,6,4,0.18) 25%,
+          rgba(8,6,4,0.22) 55%,
+          rgba(8,6,4,0.88) 82%,
+          rgba(8,6,4,0.97) 100%);
+    }
+    /* side vignette */
+    .hero-vignette {
+      position: absolute; inset: 0; z-index: 1;
+      background: radial-gradient(ellipse 90% 80% at center, transparent 20%, rgba(6,4,2,0.78) 100%);
+    }
+    /* warm gold atmospheric glow behind content */
+    .hero-content-glow {
+      position: absolute; inset: 0; z-index: 1; pointer-events: none;
+      background: radial-gradient(ellipse 50% 40% at 50% 46%, rgba(184,147,90,0.08) 0%, transparent 65%);
+    }
+    /* letterbox bars — cinematic crop feel */
+    .hero-letterbox-top,
+    .hero-letterbox-bot {
+      position: absolute; left: 0; right: 0; z-index: 3; pointer-events: none;
+      background: #080604;
+    }
+    .hero-letterbox-top { top: 0; height: 28px; }
+    .hero-letterbox-bot { bottom: 0; height: 28px; }
+    .hero-content {
+      position: relative; z-index: 4;
+      text-align: center; padding: 0 2rem; max-width: 820px;
+    }
+    .hero-logo-img {
+      width: 82px; height: 82px; object-fit: contain;
+      margin: 0 auto 0.5rem; display: block;
+      opacity: 0; transform: translateY(16px);
+      animation: riseIn 1s cubic-bezier(0.16,1,0.3,1) 0.6s forwards;
+    }
+    /* thin gold divider below logo */
+    .hero-divider {
+      width: 48px; height: 1px;
+      background: linear-gradient(to right, transparent, rgba(184,147,90,0.8), transparent);
+      margin: 0 auto 1.5rem;
+      opacity: 0; animation: riseIn 0.8s ease 0.85s forwards;
+    }
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(3rem, 7vw, 6rem);
+      font-weight: 800; letter-spacing: -0.03em; line-height: 0.95; color: var(--ivory);
+      text-shadow:
+        0 1px 2px rgba(0,0,0,1),
+        0 3px 16px rgba(0,0,0,0.9),
+        0 8px 40px rgba(0,0,0,0.6),
+        0 0 80px rgba(8,6,4,0.4);
+      opacity: 0; transform: translateY(18px);
+      animation: riseIn 1s cubic-bezier(0.16,1,0.3,1) 0.9s forwards;
+      margin-bottom: 1.5rem;
+    }
+    /* tagline with flanking gold rules */
+    .tagline-short { display: none; }
+    .tagline-full { display: inline; }
+    .hero-tagline {
+      display: flex; align-items: center; justify-content: center; gap: 1rem;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(0.9rem, 1.8vw, 1.15rem);
+      font-weight: 400; font-style: italic; color: rgba(244,241,232,0.88); letter-spacing: 0.05em;
+      text-shadow: 0 1px 10px rgba(0,0,0,0.95), 0 2px 4px rgba(0,0,0,0.9);
+      opacity: 0; transform: translateY(16px);
+      animation: riseIn 1s cubic-bezier(0.16,1,0.3,1) 1.2s forwards;
+      margin-bottom: 2.5rem;
+    }
+    .hero-tagline::before, .hero-tagline::after {
+      content: '';
+      flex: 0 0 32px; height: 1px;
+      background: linear-gradient(to right, transparent, rgba(184,147,90,0.6));
+    }
+    .hero-tagline::after {
+      background: linear-gradient(to left, transparent, rgba(184,147,90,0.6));
+    }
+    .hero-btns {
+      display: flex; gap: 1.25rem; justify-content: center; flex-wrap: wrap;
+      opacity: 0; transform: translateY(14px);
+      animation: riseIn 1s cubic-bezier(0.16,1,0.3,1) 1.5s forwards;
+    }
+    .scroll-hint {
+      position: absolute; bottom: 2.25rem; left: 50%;
+      transform: translateX(-50%); z-index: 5;
+      display: flex; flex-direction: column; align-items: center; gap: 0.6rem;
+      opacity: 0; animation: riseIn 1s ease 2.2s forwards;
+    }
+    .scroll-hint span {
+      font-size: 0.58rem; letter-spacing: 0.22em;
+      text-transform: uppercase; color: rgba(244,241,232,0.4);
+      text-indent: 0.22em;
+    }
+    .scroll-bar {
+      width: 1px; height: 44px;
+      background: linear-gradient(to bottom, rgba(184,147,90,0.9), transparent);
+      animation: scrollPulse 2.2s ease-in-out infinite;
+    }
+
+    /* BUTTONS */
+    .btn-primary {
+      display: inline-block; padding: 0.9rem 2.75rem;
+      background: var(--burgundy); color: var(--ivory);
+      font-family: 'Inter', sans-serif; font-size: 0.68rem; font-weight: 500;
+      letter-spacing: 0.16em; text-transform: uppercase; text-decoration: none;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+    .btn-primary:hover { background: var(--burgundy-hover); transform: translateY(-2px); }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-primary:focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; }
+
+    .btn-outline {
+      display: inline-block; padding: 0.9rem 2.75rem;
+      border: 1px solid rgba(244,241,232,0.35); color: var(--ivory);
+      font-family: 'Inter', sans-serif; font-size: 0.68rem; font-weight: 500;
+      letter-spacing: 0.16em; text-transform: uppercase; text-decoration: none;
+      transition: border-color 0.3s ease, background-color 0.3s ease, transform 0.2s ease;
+    }
+    .btn-outline:hover { border-color: var(--gold); background: rgba(184,147,90,0.07); transform: translateY(-2px); }
+    .btn-outline:active { transform: translateY(0); }
+    .btn-outline:focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; }
+
+    /* SECTION */
+    .section-wrap { max-width: 1300px; margin: 0 auto; padding: 7rem 3.5rem; }
+    .section-label {
+      display: block; font-size: 0.62rem; font-weight: 600;
+      letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.85rem;
+    }
+
+    /* FEATURED HEADER */
+    .featured-header {
+      display: flex; align-items: flex-end; justify-content: space-between;
+      padding-bottom: 2.5rem;
+      border-bottom: 1px solid rgba(184,147,90,0.12); margin-bottom: 0.25rem;
+    }
+    .featured-header h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.9rem,3.5vw,2.75rem); font-weight: 600;
+      letter-spacing: -0.02em; color: var(--ivory);
+    }
+    .view-all {
+      display: flex; align-items: center; gap: 0.6rem;
+      font-size: 0.68rem; font-weight: 500; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--gold); text-decoration: none;
+      white-space: nowrap; transition: gap 0.3s ease, color 0.3s ease;
+    }
+    .view-all:hover { gap: 1rem; color: var(--gold-light); }
+    .view-all:focus-visible { outline: 1px solid var(--gold); outline-offset: 4px; }
+    .view-all svg { width: 14px; height: 14px; }
+
+    /* CAR CARD */
+    .car-card {
+      display: grid; grid-template-columns: 55% 1fr;
+      background: var(--charcoal-card);
+      border: 1px solid rgba(184,147,90,0.1);
+      margin-top: 3px; overflow: hidden;
+      opacity: 0; transform: translateY(28px);
+      transition: opacity 0.75s ease, transform 0.75s ease, border-color 0.35s ease;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.3);
+    }
+    .car-card.revealed { opacity: 1; transform: translateY(0); }
+    .car-card:hover { border-color: rgba(184,147,90,0.32); }
+
+    .car-photo { position: relative; height: 400px; overflow: hidden; }
+    .car-photo img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform 0.8s cubic-bezier(0.25,0.46,0.45,0.94);
+    }
+    .car-card:hover .car-photo img { transform: scale(1.05); }
+    .car-photo-fade {
+      position: absolute; inset: 0; pointer-events: none;
+      background: linear-gradient(to right, transparent 60%, rgba(33,33,33,0.6) 100%);
+    }
+
+    .car-details {
+      padding: 2.75rem 2.75rem 2.75rem 2.5rem;
+      display: flex; flex-direction: column; justify-content: space-between;
+      border-left: 1px solid rgba(184,147,90,0.1);
+    }
+    .car-year-tag {
+      font-size: 0.62rem; font-weight: 600; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--gold); margin-bottom: 0.6rem;
+    }
+    .car-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.65rem; font-weight: 600; line-height: 1.2;
+      color: var(--ivory); margin-bottom: 1.5rem;
+    }
+    .car-rule { width: 28px; height: 1px; background: var(--gold); opacity: 0.55; margin-bottom: 1.5rem; }
+    .specs-list { list-style: none; margin-bottom: 2rem; }
+    .specs-list li {
+      display: flex; justify-content: space-between; align-items: baseline;
+      padding: 0.45rem 0; border-bottom: 1px solid rgba(244,241,232,0.05); font-size: 0.78rem;
+    }
+    .specs-list li:last-child { border-bottom: none; }
+    .spec-k { color: var(--ivory-dim); font-weight: 300; }
+    .spec-v { color: var(--ivory); font-weight: 500; text-align: right; }
+    .car-price {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem; font-style: italic; color: var(--gold); margin-bottom: 1.25rem;
+    }
+
+    /* ABOUT */
+    .about-section {
+      background: var(--charcoal-elevated);
+      border-top: 1px solid rgba(184,147,90,0.1);
+      border-bottom: 1px solid rgba(184,147,90,0.1);
+    }
+    .about-grid {
+      max-width: 1300px; margin: 0 auto; padding: 7rem 3.5rem;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 6rem; align-items: center;
+    }
+    .about-text h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.85rem,3.5vw,2.85rem); font-weight: 600;
+      letter-spacing: -0.02em; line-height: 1.2; color: var(--ivory); margin: 0.75rem 0 1.5rem;
+    }
+    .about-text p { font-size: 0.92rem; line-height: 1.85; color: var(--ivory-dim); margin-bottom: 1.2rem; }
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; }
+    .stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.85rem; font-weight: 700; color: var(--gold); line-height: 1; margin-bottom: 0.4rem;
+    }
+    .stat-lbl { font-size: 0.65rem; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ivory-dim); }
+
+    /* SERVICES */
+    .services-grid {
+      display: grid; grid-template-columns: repeat(4,1fr);
+      border: 1px solid rgba(184,147,90,0.1);
+    }
+    .svc { padding: 2.5rem 2rem; border-right: 1px solid rgba(184,147,90,0.1); transition: background-color 0.35s ease; }
+    .svc:last-child { border-right: none; }
+    .svc:hover { background: rgba(184,147,90,0.04); }
+    .svc-icon { font-size: 1.25rem; color: var(--gold); margin-bottom: 1rem; }
+    .svc-title { font-family: 'Playfair Display', serif; font-size: 1.05rem; font-weight: 600; color: var(--ivory); margin-bottom: 0.75rem; }
+    .svc-text { font-size: 0.78rem; line-height: 1.75; color: var(--ivory-dim); }
+
+    /* SELL BANNER */
+    .sell-banner {
+      background: var(--charcoal-elevated);
+      border-top: 1px solid rgba(184,147,90,0.12);
+      border-bottom: 1px solid rgba(184,147,90,0.12);
+      padding: 6rem 3.5rem; text-align: center;
+    }
+    .sell-banner h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem,4vw,3rem); font-weight: 600; color: var(--ivory); margin: 0.75rem 0 1rem;
+    }
+    .sell-banner p { font-size: 0.92rem; color: var(--ivory-dim); max-width: 520px; margin: 0 auto 2.5rem; line-height: 1.8; }
+
+    /* CONTACT BAR */
+    .contact-bar {
+      background: var(--green-deep);
+      border-top: 1px solid rgba(184,147,90,0.2);
+      border-bottom: 1px solid rgba(184,147,90,0.15);
+      padding: 3.5rem;
+    }
+    .contact-inner {
+      max-width: 1300px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 2rem;
+    }
+    .contact-bar h3 { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 600; color: var(--ivory); margin-bottom: 0.4rem; }
+    .contact-bar p { font-size: 0.82rem; color: var(--ivory-dim); }
+    .contact-btns { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .contact-btn {
+      display: inline-flex; align-items: center; gap: 0.7rem; padding: 0.85rem 1.75rem;
+      border: 1px solid rgba(184,147,90,0.4); color: var(--ivory); text-decoration: none;
+      font-size: 0.78rem; font-weight: 500; letter-spacing: 0.06em;
+      transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
+    }
+    .contact-btn:hover { background: rgba(184,147,90,0.1); border-color: var(--gold); transform: translateY(-2px); }
+    .contact-btn:active { transform: translateY(0); }
+    .contact-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; }
+    .contact-btn svg { width: 17px; height: 17px; flex-shrink: 0; }
+    .wa-btn { background: rgba(37,211,102,0.08); border-color: rgba(37,211,102,0.3); }
+    .wa-btn:hover { background: rgba(37,211,102,0.16) !important; border-color: rgba(37,211,102,0.55) !important; }
+
+    /* FOOTER */
+    footer { background: #0f0f0f; border-top: 1px solid rgba(184,147,90,0.1); }
+    .footer-inner { max-width: 1300px; margin: 0 auto; padding: 5rem 3.5rem 2.5rem; }
+    .footer-grid {
+      display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 3.5rem;
+      padding-bottom: 4rem; border-bottom: 1px solid rgba(244,241,232,0.05); margin-bottom: 2.5rem;
+    }
+    .footer-brand-logo { height: 56px; margin-bottom: 1.25rem; display: block; }
+    .footer-brand-text { font-size: 0.8rem; line-height: 1.75; color: var(--ivory-dim); max-width: 270px; }
+    .footer-col-title { font-size: 0.6rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 1.25rem; }
+    .footer-links { list-style: none; }
+    .footer-links li { margin-bottom: 0.7rem; }
+    .footer-links a { font-size: 0.8rem; color: var(--ivory-dim); text-decoration: none; transition: color 0.3s ease; }
+    .footer-links a:hover { color: var(--ivory); }
+    .footer-links a:focus-visible { outline: 1px solid var(--gold); outline-offset: 3px; }
+    .footer-contact-item { font-size: 0.8rem; color: var(--ivory-dim); line-height: 1.6; margin-bottom: 0.6rem; }
+    .footer-bottom { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+    .footer-bottom p { font-size: 0.7rem; color: rgba(244,241,232,0.28); letter-spacing: 0.04em; }
+
+    /* ANIMATIONS */
+    @keyframes riseIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes scrollPulse { 0%,100% { opacity: 0.35; transform: scaleY(1); } 50% { opacity: 0.9; transform: scaleY(1.08); } }
+    .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.8s ease, transform 0.8s ease; }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+    .reveal-d1 { transition-delay: 0.12s; }
+    .reveal-d2 { transition-delay: 0.24s; }
+
+    /* RESPONSIVE */
+    @media (max-width: 1024px) {
+      .services-grid { grid-template-columns: repeat(2,1fr); }
+      .svc:nth-child(2) { border-right: none; }
+      .svc:nth-child(1), .svc:nth-child(2) { border-bottom: 1px solid rgba(184,147,90,0.1); }
+      .about-grid { grid-template-columns: 1fr; gap: 4rem; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 768px) {
+      .nav { padding: 1rem 1.25rem; }
+      .nav.scrolled { padding: 0.75rem 1.25rem; }
+      .nav-links { display: none; }
+      .nav-logo { height: 34px; }
+      .nav.scrolled .nav-logo { height: 28px; }
+      .nav-brand-name { font-size: 0.78rem; }
+      .nav-brand-tagline { font-size: 0.48rem; letter-spacing: 0.14em; }
+      .hero-btns { flex-direction: column; align-items: center; gap: 0.85rem; }
+      .hero-btns .btn { width: 260px; text-align: center; }
+      .car-card { grid-template-columns: 1fr; }
+      .car-photo { height: 240px; }
+      .car-details { border-left: none; border-top: 1px solid rgba(184,147,90,0.1); padding: 1.75rem; }
+      .section-wrap { padding: 4rem 1.25rem; }
+      .about-grid { padding: 4rem 1.25rem; }
+      .sell-banner { padding: 4rem 1.25rem; }
+      .contact-bar { padding: 2.5rem 1.25rem; }
+      .contact-inner { flex-direction: column; align-items: flex-start; gap: 1rem; }
+      .footer-inner { padding: 3.5rem 1.25rem 2rem; }
+      .footer-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+      .featured-header { flex-direction: column; align-items: flex-start; gap: 1.25rem; }
+      .services-grid { grid-template-columns: 1fr; }
+      .svc { border-right: none; border-bottom: 1px solid rgba(184,147,90,0.1); }
+      .svc:last-child { border-bottom: none; }
+      .hero-tagline { font-size: 0.78rem; gap: 0.5rem; letter-spacing: 0.02em; }
+      .hero-tagline::before, .hero-tagline::after { flex: 0 0 16px; }
+      .tagline-full { display: none; }
+      .tagline-short { display: inline; }
+      .stats-grid { grid-template-columns: 1fr 1fr; gap: 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVIGATION -->
+  <nav class="nav" id="mainNav">
+    <a href="index.html" class="nav-brand" aria-label="Atlantic Motor Heritage — Home">
+      <img src="brand_assets/logo.png" alt="" class="nav-logo" aria-hidden="true">
+      <div class="nav-brand-text">
+        <span class="nav-brand-name">Atlantic Motor Heritage</span>
+        <span class="nav-brand-tagline">European Collector Cars</span>
+      </div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="inventory.html">Inventory</a></li>
+      <li><a href="#sell">Sell Your Car</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#contact" class="nav-contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-letterbox-top"></div>
+    <div class="hero-letterbox-bot"></div>
+    <div class="hero-fallback"></div>
+    <video class="hero-video" id="heroVid" autoplay muted loop playsinline preload="auto">
+      <source src="brand_assets/hero-video.mp4" type="video/mp4">
+    </video>
+    <div class="hero-grade"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-vignette"></div>
+    <div class="hero-content-glow"></div>
+    <div class="hero-content">
+      <img src="brand_assets/logo.png" alt="" class="hero-logo-img" aria-hidden="true">
+      <div class="hero-divider"></div>
+      <h1 class="hero-title">Atlantic Motor Heritage</h1>
+      <p class="hero-tagline"><span class="tagline-full">European Collector Cars — Located in Portugal. Delivered Worldwide.</span><span class="tagline-short">European Collector Cars — Portugal</span></p>
+      <div class="hero-btns">
+        <a href="inventory.html" class="btn-primary">View Inventory</a>
+        <a href="#sell" class="btn-outline">Sell Your Car</a>
+      </div>
+    </div>
+    <div class="scroll-hint">
+      <span>Discover</span>
+      <div class="scroll-bar"></div>
+    </div>
+  </section>
+
+  <!-- FEATURED INVENTORY -->
+  <section>
+    <div class="section-wrap">
+      <div class="featured-header">
+        <div>
+          <span class="section-label">Current Collection</span>
+          <h2>Featured Vehicles</h2>
+        </div>
+        <a href="inventory.html" class="view-all">
+          View Full Inventory
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+
+      <!-- 911 Turbo -->
+      <div class="car-card" data-reveal>
+        <div class="car-photo">
+          <img src="brand_assets/car-911-turbo-red.png" alt="1991 Porsche 911 Turbo — Guards Red" loading="eager"
+               onerror="this.src='https://placehold.co/900x500/1a1a1a/B8935A?text=Porsche+911+Turbo+%E2%80%94+1991'">
+          <div class="car-photo-fade"></div>
+        </div>
+        <div class="car-details">
+          <div>
+            <p class="car-year-tag">1991</p>
+            <h3 class="car-title">Porsche 911 Turbo</h3>
+            <div class="car-rule"></div>
+            <ul class="specs-list">
+              <li><span class="spec-k">Engine</span><span class="spec-v">3.3L Flat-Six Turbo</span></li>
+              <li><span class="spec-k">Transmission</span><span class="spec-v">Manual</span></li>
+              <li><span class="spec-k">Colour</span><span class="spec-v">Guards Red</span></li>
+              <li><span class="spec-k">Location</span><span class="spec-v">Portugal</span></li>
+            </ul>
+          </div>
+          <div>
+            <p class="car-price">Price on Request</p>
+            <a href="https://wa.me/351XXXXXXXXX?text=Hello%2C%20I%20am%20interested%20in%20the%20Porsche%20911%20Turbo%201991." class="btn-primary" target="_blank" rel="noopener noreferrer">Request Details</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 356 Cabriolet -->
+      <div class="car-card" data-reveal>
+        <div class="car-photo">
+          <img src="brand_assets/car-356-cabriolet-black.png" alt="1962 Porsche 356 Cabriolet — Ivory" loading="lazy">
+          <div class="car-photo-fade"></div>
+        </div>
+        <div class="car-details">
+          <div>
+            <p class="car-year-tag">1962</p>
+            <h3 class="car-title">Porsche 356 Cabriolet</h3>
+            <div class="car-rule"></div>
+            <ul class="specs-list">
+              <li><span class="spec-k">Engine</span><span class="spec-v">1.6L Flat-Four</span></li>
+              <li><span class="spec-k">Transmission</span><span class="spec-v">Manual</span></li>
+              <li><span class="spec-k">Colour</span><span class="spec-v">Ivory</span></li>
+              <li><span class="spec-k">Location</span><span class="spec-v">Portugal</span></li>
+            </ul>
+          </div>
+          <div>
+            <p class="car-price">Price on Request</p>
+            <a href="https://wa.me/351XXXXXXXXX?text=Hello%2C%20I%20am%20interested%20in%20the%20Porsche%20356%20Cabriolet%201962." class="btn-primary" target="_blank" rel="noopener noreferrer">Request Details</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 911 Targa Gold -->
+      <div class="car-card" data-reveal>
+        <div class="car-photo">
+          <img src="brand_assets/car-911-targa-gold.png" alt="1972 Porsche 911 Targa — Olive Gold" loading="lazy">
+          <div class="car-photo-fade"></div>
+        </div>
+        <div class="car-details">
+          <div>
+            <p class="car-year-tag">1972</p>
+            <h3 class="car-title">Porsche 911 Targa</h3>
+            <div class="car-rule"></div>
+            <ul class="specs-list">
+              <li><span class="spec-k">Engine</span><span class="spec-v">2.4L Flat-Six</span></li>
+              <li><span class="spec-k">Transmission</span><span class="spec-v">Manual</span></li>
+              <li><span class="spec-k">Colour</span><span class="spec-v">Olive Gold</span></li>
+              <li><span class="spec-k">Location</span><span class="spec-v">Portugal</span></li>
+            </ul>
+          </div>
+          <div>
+            <p class="car-price">Price on Request</p>
+            <a href="https://wa.me/351XXXXXXXXX?text=Hello%2C%20I%20am%20interested%20in%20the%20Porsche%20911%20Targa%201972." class="btn-primary" target="_blank" rel="noopener noreferrer">Request Details</a>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align:center;padding-top:3.5rem;border-top:1px solid rgba(184,147,90,0.1);margin-top:3px;">
+        <span class="section-label" style="display:inline-block;margin-bottom:1rem;">6 Vehicles Available</span><br>
+        <a href="inventory.html" class="btn-outline">View Complete Collection</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="about-section" id="about">
+    <div class="about-grid">
+      <div class="reveal">
+        <span class="section-label">Our Philosophy</span>
+        <h2>Carefully Selected.<br>Authentically Presented.</h2>
+        <p>Atlantic Motor Heritage was founded with a simple idea: exceptional automobiles deserve careful preservation and knowledgeable ownership.</p>
+        <p>We specialise in classic sports cars and collector vehicles that represent milestones in European automotive history — from iconic air-cooled Porsche sports cars to rare performance models, each chosen for its authenticity and mechanical character.</p>
+        <p>Based in Portugal, we serve collectors and enthusiasts across Germany, the Netherlands, Poland, and Europe.</p>
+        <a href="#contact" class="btn-outline" style="margin-top:2rem;display:inline-block;">Get in Touch</a>
+      </div>
+      <div class="stats-grid reveal reveal-d2">
+        <div><div class="stat-num">6+</div><div class="stat-lbl">Vehicles in Collection</div></div>
+        <div><div class="stat-num">EU</div><div class="stat-lbl">Wide Delivery</div></div>
+        <div><div class="stat-num">100%</div><div class="stat-lbl">Transparent Process</div></div>
+        <div><div class="stat-num">PT</div><div class="stat-lbl">Based in Portugal</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICES -->
+  <section>
+    <div class="section-wrap">
+      <div style="margin-bottom:3rem;" class="reveal">
+        <span class="section-label">International Buyers</span>
+        <h2 style="font-family:'Playfair Display',serif;font-size:clamp(1.8rem,3.5vw,2.6rem);font-weight:600;letter-spacing:-0.02em;color:var(--ivory);margin-top:0.75rem;">
+          We Make International Buying Simple
+        </h2>
+      </div>
+      <div class="services-grid reveal reveal-d1">
+        <div class="svc">
+          <div class="svc-icon">◎</div>
+          <h3 class="svc-title">Remote Presentations</h3>
+          <p class="svc-text">Detailed video walkarounds and live presentations for clients unable to visit in person.</p>
+        </div>
+        <div class="svc">
+          <div class="svc-icon">◈</div>
+          <h3 class="svc-title">Full Documentation</h3>
+          <p class="svc-text">Every vehicle presented with complete documentation and history wherever available.</p>
+        </div>
+        <div class="svc">
+          <div class="svc-icon">◇</div>
+          <h3 class="svc-title">Export Assistance</h3>
+          <p class="svc-text">We handle export paperwork and regulatory requirements for European delivery.</p>
+        </div>
+        <div class="svc">
+          <div class="svc-icon">○</div>
+          <h3 class="svc-title">Transport Coordination</h3>
+          <p class="svc-text">Secure enclosed transport to Germany, Netherlands, Poland and all EU destinations.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SELL BANNER -->
+  <section class="sell-banner reveal" id="sell">
+    <span class="section-label">Consignment &amp; Private Sales</span>
+    <h2>Have a Collector Car to Sell?</h2>
+    <p>Atlantic Motor Heritage is constantly seeking exceptional European collector vehicles. We offer direct purchase and consignment sales — all enquiries treated with complete discretion.</p>
+    <a href="https://wa.me/351XXXXXXXXX?text=Hello%2C%20I%20would%20like%20to%20discuss%20selling%20a%20collector%20car." class="btn-primary" target="_blank" rel="noopener noreferrer">Discuss Your Vehicle</a>
+  </section>
+
+  <!-- CONTACT BAR -->
+  <div class="contact-bar" id="contact">
+    <div class="contact-inner">
+      <div>
+        <h3>Get in Touch</h3>
+        <p>Portugal — Serving collectors across Europe</p>
+      </div>
+      <div class="contact-btns">
+        <a href="https://wa.me/351XXXXXXXXX" class="contact-btn wa-btn" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          WhatsApp
+        </a>
+        <a href="mailto:info@atlanticmotorheritage.com" class="contact-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          info@atlanticmotorheritage.com
+        </a>
+        <a href="tel:+351XXXXXXXXX" class="contact-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+          +351 XXX XXX XXX
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div>
+          <img src="brand_assets/logo.png" alt="Atlantic Motor Heritage" class="footer-brand-logo">
+          <p class="footer-brand-text">European collector cars sourced in Portugal and delivered worldwide. Timeless machines, carefully selected.</p>
+        </div>
+        <div>
+          <h4 class="footer-col-title">Navigation</h4>
+          <ul class="footer-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="inventory.html">Inventory</a></li>
+            <li><a href="#sell">Sell Your Car</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="footer-col-title">Collection</h4>
+          <ul class="footer-links">
+            <li><a href="inventory.html">Porsche 911 Turbo</a></li>
+            <li><a href="inventory.html">Porsche 356 Cabriolet</a></li>
+            <li><a href="inventory.html">Porsche 911 Targa</a></li>
+            <li><a href="inventory.html">Porsche Boxster S</a></li>
+            <li><a href="inventory.html">Renault 8 Alpine</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="footer-col-title">Contact</h4>
+          <p class="footer-contact-item">Portugal</p>
+          <p class="footer-contact-item">+351 XXX XXX XXX</p>
+          <p class="footer-contact-item">info@atlanticmotorheritage.com</p>
+          <p class="footer-contact-item" style="margin-top:0.75rem;font-size:0.72rem;">Serving collectors in Germany, Netherlands, Poland &amp; across Europe.</p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2025 Atlantic Motor Heritage. All rights reserved.</p>
+        <p>European Collector Cars — Portugal</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Video: skip static first second
+    const vid = document.getElementById('heroVid');
+    if (vid) {
+      vid.addEventListener('loadedmetadata', () => { vid.currentTime = 5; });
+      vid.addEventListener('canplaythrough', () => { vid.classList.add('ready'); });
+      setTimeout(() => { vid.classList.add('ready'); }, 2500);
+    }
+    // Nav scroll
+    const nav = document.getElementById('mainNav');
+    window.addEventListener('scroll', () => { nav.classList.toggle('scrolled', window.scrollY > 50); }, { passive: true });
+    // Reveal on scroll
+    const revealObs = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); revealObs.unobserve(e.target); } });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
+    // Car card stagger
+    const cardObs = new IntersectionObserver((entries) => {
+      entries.forEach((e, i) => {
+        if (e.isIntersecting) {
+          setTimeout(() => { e.target.classList.add('revealed'); }, i * 160);
+          cardObs.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.08 });
+    document.querySelectorAll('[data-reveal]').forEach(el => cardObs.observe(el));
+  </script>
+</body>
+</html>

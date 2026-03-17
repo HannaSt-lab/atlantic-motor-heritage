@@ -1,0 +1,1 @@
+{"name":"atlantic-motor-heritage","type":"module","private":true,"dependencies":{"puppeteer":"^24.39.0"},"devDependencies":{"jimp":"^1.6.0"}}
