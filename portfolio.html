@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Case Study — Atlantic Motor Heritage · Hanna Fitin Automation</title>
+  <meta name="description" content="Full automation stack for a European collector car dealer — website, n8n workflows, HubSpot CRM, AI concierge bot. Built by Hanna Fitin.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Inter:wght@300;400;500;600&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --charcoal:          #1a1a1a;
+      --charcoal-card:     #212121;
+      --charcoal-elevated: #252525;
+      --gold:              #B8935A;
+      --gold-light:        #cfa96e;
+      --burgundy:          #8C1D2D;
+      --burgundy-hover:    #a62235;
+      --ivory:             #F4F1E8;
+      --ivory-dim:         rgba(244,241,232,0.58);
+      --green-deep:        #0c2218;
+      --green-mid:         #0F2A1F;
+      --mono:              'IBM Plex Mono', monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background-color: var(--charcoal);
+      color: var(--ivory);
+      font-family: 'Inter', sans-serif;
+      font-weight: 300;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 9999;
+      opacity: 0.025;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 200px;
+    }
+
+    /* ── NAV ── */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+      padding: 1.5rem 3.5rem;
+      display: flex; align-items: center; justify-content: space-between;
+      transition: background-color 0.5s ease, padding 0.4s ease, border-color 0.5s ease;
+      border-bottom: 1px solid transparent;
+    }
+    .nav.scrolled {
+      background: rgba(22,22,22,0.96);
+      backdrop-filter: blur(12px);
+      padding: 0.875rem 3.5rem;
+      border-bottom-color: rgba(184,147,90,0.18);
+    }
+    .nav-logo { height: 40px; width: auto; }
+    .nav-brand { display: flex; align-items: center; gap: 0.85rem; text-decoration: none; }
+    .nav-brand-text { display: flex; flex-direction: column; }
+    .nav-brand-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.95rem; font-weight: 600;
+      letter-spacing: 0.04em; color: var(--ivory); line-height: 1.1;
+    }
+    .nav-brand-tagline {
+      font-size: 0.55rem; font-weight: 400;
+      letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold);
+    }
+    .nav-back {
+      font-size: 0.68rem; font-weight: 500; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--ivory-dim); text-decoration: none;
+      display: flex; align-items: center; gap: 0.5rem;
+      transition: color 0.3s ease;
+    }
+    .nav-back:hover { color: var(--gold); }
+    .nav-back svg { width: 14px; height: 14px; }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      background: linear-gradient(155deg, var(--green-mid) 0%, var(--green-deep) 50%, #0a1510 100%);
+      display: flex; align-items: center; justify-content: center;
+      padding: 9rem 3.5rem 7rem;
+      position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 80% 55% at 50% 40%, rgba(184,147,90,0.07) 0%, transparent 68%);
+    }
+    .hero-grid-overlay {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(184,147,90,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(184,147,90,0.04) 1px, transparent 1px);
+      background-size: 64px 64px;
+    }
+    .hero-inner {
+      position: relative; z-index: 1;
+      max-width: 860px; margin: 0 auto; text-align: center;
+    }
+    .case-label {
+      font-family: var(--mono);
+      font-size: 0.66rem; letter-spacing: 0.24em; text-transform: uppercase; color: var(--gold);
+      display: inline-flex; align-items: center; gap: 0.8rem;
+      opacity: 0; transform: translateY(14px);
+      animation: riseIn 0.9s cubic-bezier(0.22,1,0.36,1) 0.3s forwards;
+    }
+    .case-label::before, .case-label::after {
+      content: ''; display: inline-block;
+      width: 28px; height: 1px; background: rgba(184,147,90,0.45);
+    }
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(3rem, 7vw, 5.25rem);
+      font-weight: 700; line-height: 1.05;
+      letter-spacing: -0.02em; color: var(--ivory);
+      margin: 1.25rem 0 0.5rem;
+      opacity: 0; transform: translateY(20px);
+      animation: riseIn 1s cubic-bezier(0.22,1,0.36,1) 0.52s forwards;
+    }
+    .hero-sub {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.05rem, 2.4vw, 1.45rem);
+      font-weight: 300; font-style: italic;
+      color: var(--ivory-dim); letter-spacing: 0.025em;
+      margin-bottom: 2.5rem;
+      opacity: 0; transform: translateY(14px);
+      animation: riseIn 0.9s cubic-bezier(0.22,1,0.36,1) 0.72s forwards;
+    }
+    .tech-badges {
+      display: flex; flex-wrap: wrap; gap: 0.5rem;
+      justify-content: center; margin-bottom: 3rem;
+      opacity: 0; transform: translateY(10px);
+      animation: riseIn 0.9s cubic-bezier(0.22,1,0.36,1) 0.88s forwards;
+    }
+    .badge {
+      font-family: var(--mono);
+      font-size: 0.63rem; letter-spacing: 0.1em;
+      padding: 0.3rem 0.8rem;
+      border: 1px solid rgba(184,147,90,0.28);
+      color: var(--gold); background: rgba(184,147,90,0.05);
+      border-radius: 2px;
+    }
+    .hero-ctas {
+      display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
+      opacity: 0; transform: translateY(10px);
+      animation: riseIn 0.9s cubic-bezier(0.22,1,0.36,1) 1.02s forwards;
+    }
+    .scroll-hint {
+      position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 0.5rem; z-index: 1;
+      opacity: 0; animation: riseIn 0.8s ease 1.55s forwards;
+    }
+    .scroll-hint span {
+      font-family: var(--mono);
+      font-size: 0.57rem; letter-spacing: 0.22em; text-transform: uppercase;
+      color: rgba(184,147,90,0.45);
+    }
+    .scroll-line {
+      width: 1px; height: 44px;
+      background: linear-gradient(to bottom, rgba(184,147,90,0.5), transparent);
+      animation: scrollPulse 2.2s ease-in-out infinite;
+    }
+    @keyframes riseIn { to { opacity: 1; transform: translateY(0); } }
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 1; transform: scaleY(1); transform-origin: top; }
+      50%       { opacity: 0.25; transform: scaleY(0.4); transform-origin: top; }
+    }
+
+    /* ── BUTTONS ── */
+    .btn-primary {
+      padding: 0.85rem 2.2rem;
+      background: var(--burgundy); color: var(--ivory);
+      font-size: 0.68rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase;
+      text-decoration: none; border: 1px solid var(--burgundy);
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+    .btn-primary:hover { background: var(--burgundy-hover); transform: translateY(-2px); }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-outline {
+      padding: 0.85rem 2.2rem;
+      background: transparent; color: var(--ivory);
+      font-size: 0.68rem; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase;
+      text-decoration: none; border: 1px solid rgba(244,241,232,0.22);
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      transition: border-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+    }
+    .btn-outline:hover { border-color: var(--gold); color: var(--gold); transform: translateY(-2px); }
+    .btn-outline:active { transform: translateY(0); }
+
+    /* ── SECTION ── */
+    .section-wrap {
+      max-width: 1280px; margin: 0 auto;
+      padding: 7rem 3.5rem;
+    }
+    .section-label {
+      font-family: var(--mono);
+      font-size: 0.61rem; letter-spacing: 0.24em; text-transform: uppercase; color: var(--gold);
+      margin-bottom: 1.25rem; display: block;
+    }
+    .section-heading {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 600; line-height: 1.2; letter-spacing: -0.01em; color: var(--ivory);
+      margin-bottom: 1.25rem;
+    }
+    .section-sub {
+      font-size: 0.975rem; color: var(--ivory-dim); line-height: 1.85; max-width: 55ch;
+    }
+
+    /* ── PROBLEM ── */
+    .problem-bg {
+      background: var(--charcoal-elevated);
+      border-top: 1px solid rgba(184,147,90,0.1);
+      border-bottom: 1px solid rgba(184,147,90,0.1);
+    }
+    .problem-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 6rem; align-items: center;
+    }
+    .pain-list { list-style: none; display: flex; flex-direction: column; gap: 1.75rem; }
+    .pain-item { display: flex; gap: 1.25rem; align-items: flex-start; }
+    .pain-bar {
+      width: 2px; flex-shrink: 0;
+      background: linear-gradient(to bottom, var(--gold), rgba(184,147,90,0.15));
+      align-self: stretch; min-height: 52px;
+    }
+    .pain-text strong {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem; font-weight: 600; color: var(--ivory);
+      display: block; margin-bottom: 0.25rem;
+    }
+    .pain-text p { font-size: 0.85rem; color: var(--ivory-dim); line-height: 1.65; }
+
+    /* ── FLOW DIAGRAM ── */
+    .flow-bg {
+      background: var(--charcoal);
+      border-bottom: 1px solid rgba(184,147,90,0.08);
+      overflow: hidden;
+    }
+    .flow-overflow { overflow-x: auto; padding: 0 3.5rem 4rem; }
+    .flow-track {
+      display: flex; align-items: stretch;
+      min-width: 860px; max-width: 1100px; margin: 0 auto;
+    }
+    .flow-node {
+      flex: 1;
+      background: var(--charcoal-card);
+      border: 1px solid rgba(184,147,90,0.14);
+      padding: 1.75rem 1.4rem;
+      position: relative;
+      opacity: 0; transform: translateY(22px);
+      transition: border-color 0.3s ease, background-color 0.3s ease;
+    }
+    .flow-node:hover { border-color: rgba(184,147,90,0.35); background: var(--charcoal-elevated); }
+    .flow-node.flow-in {
+      animation: flowNodeIn 0.65s cubic-bezier(0.22,1,0.36,1) forwards;
+    }
+    .flow-icon { width: 34px; height: 34px; margin-bottom: 1rem; color: var(--gold); }
+    .flow-step {
+      font-family: var(--mono);
+      font-size: 0.55rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold);
+      margin-bottom: 0.4rem; display: block;
+    }
+    .flow-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.9rem; font-weight: 600; color: var(--ivory);
+      margin-bottom: 0.4rem; line-height: 1.3;
+    }
+    .flow-desc { font-size: 0.72rem; color: var(--ivory-dim); line-height: 1.55; }
+    .flow-status {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      margin-top: 1rem;
+      font-family: var(--mono); font-size: 0.57rem; letter-spacing: 0.14em; text-transform: uppercase;
+    }
+    .sdot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: #22c55e; box-shadow: 0 0 7px rgba(34,197,94,0.65);
+      animation: sdotPulse 2s infinite;
+    }
+    .stext { color: #22c55e; }
+    @keyframes sdotPulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.5; transform: scale(1.4); }
+    }
+    .flow-connector {
+      flex-shrink: 0; width: 36px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .flow-connector svg { width: 36px; height: 14px; overflow: visible; }
+    .connector-line {
+      stroke: rgba(184,147,90,0.3); stroke-width: 1;
+      stroke-dasharray: 50; stroke-dashoffset: 50;
+    }
+    .connector-line.line-in { animation: drawLine 0.45s ease forwards; }
+    .connector-head { fill: rgba(184,147,90,0.3); }
+
+    @keyframes flowNodeIn { to { opacity: 1; transform: translateY(0); } }
+    @keyframes drawLine  { to { stroke-dashoffset: 0; } }
+
+    /* ── BUILT GRID ── */
+    .built-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr);
+      gap: 1.5px; background: rgba(184,147,90,0.1);
+      border: 1px solid rgba(184,147,90,0.1);
+      margin-top: 3.5rem;
+    }
+    .built-card {
+      background: var(--charcoal-card);
+      padding: 2.5rem; position: relative; overflow: hidden;
+      transition: background-color 0.35s ease;
+    }
+    .built-card:hover { background: var(--charcoal-elevated); }
+    .built-card::after {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 1.5px;
+      background: linear-gradient(90deg, transparent 0%, var(--gold) 50%, transparent 100%);
+      opacity: 0; transition: opacity 0.4s ease;
+    }
+    .built-card:hover::after { opacity: 1; }
+    .built-icon { width: 42px; height: 42px; margin-bottom: 1.25rem; color: var(--gold); }
+    .built-badge {
+      position: absolute; top: 1.5rem; right: 1.5rem;
+      font-family: var(--mono); font-size: 0.54rem; letter-spacing: 0.14em; text-transform: uppercase;
+      padding: 0.28rem 0.65rem; border-radius: 2px;
+    }
+    .built-badge.live {
+      background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.28); color: #22c55e;
+    }
+    .built-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem; font-weight: 600; color: var(--ivory);
+      margin-bottom: 0.55rem; line-height: 1.3;
+    }
+    .built-desc { font-size: 0.85rem; color: var(--ivory-dim); line-height: 1.7; }
+    .built-tech { margin-top: 1.25rem; display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .ttag {
+      font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.08em;
+      padding: 0.2rem 0.55rem;
+      border: 1px solid rgba(184,147,90,0.18); color: rgba(184,147,90,0.65); border-radius: 2px;
+    }
+
+    /* ── RESULTS ── */
+    .results-bg {
+      background: var(--charcoal-elevated);
+      border-top: 1px solid rgba(184,147,90,0.1);
+      border-bottom: 1px solid rgba(184,147,90,0.1);
+    }
+    .results-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 0; margin-top: 4rem;
+    }
+    .stat-block {
+      padding: 2.5rem 1.5rem; text-align: center;
+      border-right: 1px solid rgba(184,147,90,0.1);
+    }
+    .stat-block:last-child { border-right: none; }
+    .stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.8rem, 5vw, 3.8rem);
+      font-weight: 700; color: var(--ivory); line-height: 1;
+      display: flex; align-items: baseline; justify-content: center; gap: 0.1em;
+    }
+    .stat-suffix { font-family: var(--mono); font-size: 1.1rem; color: var(--gold); font-weight: 300; }
+    .stat-prefix { font-family: var(--mono); font-size: 0.95rem; color: var(--gold); font-weight: 300; }
+    .stat-lbl {
+      font-family: var(--mono);
+      font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ivory-dim);
+      margin-top: 0.75rem; display: block;
+    }
+
+    /* ── TIMELINE ── */
+    .timeline { position: relative; padding-left: 1.5rem; margin-top: 3.5rem; }
+    .timeline::before {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 1px;
+      background: linear-gradient(to bottom, var(--gold), rgba(184,147,90,0.08));
+    }
+    .tl-item { position: relative; padding: 0 0 2.75rem 2.5rem; }
+    .tl-dot {
+      position: absolute; left: -1.81rem; top: 0.3rem;
+      width: 9px; height: 9px; border-radius: 50%;
+      background: var(--charcoal); border: 1px solid var(--gold);
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    .tl-item:hover .tl-dot { background: var(--gold); box-shadow: 0 0 10px rgba(184,147,90,0.5); }
+    .tl-step {
+      font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--gold); margin-bottom: 0.45rem;
+    }
+    .tl-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem; font-weight: 600; color: var(--ivory); margin-bottom: 0.4rem;
+    }
+    .tl-body { font-size: 0.87rem; color: var(--ivory-dim); line-height: 1.75; max-width: 52ch; }
+
+    /* ── CTA ── */
+    .cta-bg {
+      background: var(--green-deep);
+      border-top: 1px solid rgba(184,147,90,0.12);
+      position: relative; overflow: hidden;
+    }
+    .cta-bg::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 70% 60% at 50% 50%, rgba(184,147,90,0.055) 0%, transparent 70%);
+    }
+    .cta-inner {
+      position: relative; z-index: 1;
+      max-width: 580px; margin: 0 auto; text-align: center;
+    }
+    .cta-eyebrow {
+      font-family: var(--mono);
+      font-size: 0.63rem; letter-spacing: 0.24em; text-transform: uppercase; color: var(--gold);
+      margin-bottom: 1.25rem; display: block;
+    }
+    .cta-heading {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 4.5vw, 3.1rem);
+      font-weight: 600; line-height: 1.2; color: var(--ivory); margin-bottom: 1rem;
+    }
+    .cta-sub {
+      font-size: 0.95rem; color: var(--ivory-dim);
+      line-height: 1.85; margin-bottom: 2.75rem;
+    }
+    .cta-btns { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .cta-note {
+      margin-top: 2rem;
+      font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.15em;
+      text-transform: uppercase; color: rgba(184,147,90,0.35);
+    }
+
+    /* ── FOOTER ── */
+    .footer {
+      background: #111; padding: 2rem 3.5rem;
+      border-top: 1px solid rgba(184,147,90,0.1);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .footer-copy {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.85rem; color: var(--ivory-dim); font-style: italic;
+    }
+    .footer-link {
+      font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--ivory-dim); text-decoration: none; transition: color 0.3s ease;
+    }
+    .footer-link:hover { color: var(--gold); }
+
+    /* ── REVEAL UTILITY ── */
+    .reveal {
+      opacity: 0; transform: translateY(26px);
+      transition: opacity 0.85s cubic-bezier(0.22,1,0.36,1), transform 0.85s cubic-bezier(0.22,1,0.36,1);
+    }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+    .d1 { transition-delay: 0.1s; }
+    .d2 { transition-delay: 0.2s; }
+    .d3 { transition-delay: 0.3s; }
+    .d4 { transition-delay: 0.4s; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1024px) {
+      .problem-grid { grid-template-columns: 1fr; gap: 3rem; }
+      .results-grid { grid-template-columns: repeat(2, 1fr); }
+      .stat-block:nth-child(2) { border-right: none; }
+      .stat-block:nth-child(3) { border-top: 1px solid rgba(184,147,90,0.1); }
+      .stat-block:nth-child(4) { border-top: 1px solid rgba(184,147,90,0.1); border-right: none; }
+      .built-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 768px) {
+      .nav { padding: 1.25rem 1.5rem; }
+      .nav.scrolled { padding: 0.875rem 1.5rem; }
+      .hero { padding: 6.5rem 1.5rem 5rem; }
+      .section-wrap { padding: 4.5rem 1.5rem; }
+      .flow-overflow { padding: 0 1.5rem 3rem; }
+      .results-bg .section-wrap { padding: 4.5rem 1.5rem; }
+      .footer { flex-direction: column; gap: 0.75rem; text-align: center; padding: 1.75rem 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="nav" id="mainNav">
+    <a href="index.html" class="nav-brand">
+      <img src="brand_assets/logo.png" alt="Atlantic Motor Heritage" class="nav-logo">
+      <div class="nav-brand-text">
+        <span class="nav-brand-name">Atlantic Motor Heritage</span>
+        <span class="nav-brand-tagline">European Collector Cars</span>
+      </div>
+    </a>
+    <a href="index.html" class="nav-back">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 12L6 8l4-4"/></svg>
+      Back to site
+    </a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-grid-overlay"></div>
+    <div class="hero-inner">
+      <span class="case-label">Case Study · 2026</span>
+      <h1 class="hero-title">Atlantic Motor<br>Heritage</h1>
+      <p class="hero-sub">From first click to CRM — fully automated in under 2 seconds</p>
+      <div class="tech-badges">
+        <span class="badge">n8n</span>
+        <span class="badge">Claude AI</span>
+        <span class="badge">HubSpot CRM</span>
+        <span class="badge">Telegram Bot</span>
+        <span class="badge">Vercel</span>
+        <span class="badge">HTML · CSS · JS</span>
+      </div>
+      <div class="hero-ctas">
+        <a href="index.html" target="_blank" rel="noopener" class="btn-outline">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8h12M9 4l4 4-4 4"/></svg>
+          View live site
+        </a>
+      </div>
+    </div>
+    <div class="scroll-hint">
+      <span>Scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- PROBLEM -->
+  <div class="problem-bg">
+    <div class="section-wrap">
+      <div class="problem-grid">
+        <div>
+          <span class="section-label reveal">01 / The Problem</span>
+          <h2 class="section-heading reveal d1">Manual.<br>Slow.<br>Invisible.</h2>
+          <p class="section-sub reveal d2">A European collector car dealer with serious inventory and serious buyers — but every lead that filled out the contact form disappeared into an inbox. No tracking, no follow-up, no record of who enquired about what.</p>
+        </div>
+        <ul class="pain-list">
+          <li class="pain-item reveal d1">
+            <div class="pain-bar"></div>
+            <div class="pain-text">
+              <strong>No lead visibility</strong>
+              <p>Inquiries arrived by email with no status, no source, no pipeline. High-value leads were going cold.</p>
+            </div>
+          </li>
+          <li class="pain-item reveal d2">
+            <div class="pain-bar"></div>
+            <div class="pain-text">
+              <strong>Zero automation</strong>
+              <p>Every piece of data entered manually. No CRM, no deal tracking, no record of car interest per contact.</p>
+            </div>
+          </li>
+          <li class="pain-item reveal d3">
+            <div class="pain-bar"></div>
+            <div class="pain-text">
+              <strong>No always-on presence</strong>
+              <p>A buyer browsing at midnight in Germany had no way to get instant answers — and no reason to stay.</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLOW DIAGRAM -->
+  <div class="flow-bg">
+    <div class="section-wrap" style="padding-bottom:0;">
+      <span class="section-label reveal">02 / The Solution</span>
+      <h2 class="section-heading reveal d1">The automation pipeline</h2>
+      <p class="section-sub reveal d2">Every lead captured, classified, stored, and responded to — without a single manual step. Built in n8n and connected to every system the client uses.</p>
+    </div>
+    <div class="flow-overflow" style="padding-top:3rem;">
+      <div class="flow-track" id="flowTrack">
+
+        <div class="flow-node" data-node>
+          <svg class="flow-icon" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.2">
+            <rect x="6" y="7" width="32" height="30" rx="2"/>
+            <path d="M6 14h32"/>
+            <circle cx="11" cy="10.5" r="1.2" fill="currentColor"/>
+            <circle cx="16" cy="10.5" r="1.2" fill="currentColor"/>
+            <path d="M13 21h10M13 25.5h14M13 30h8"/>
+          </svg>
+          <span class="flow-step">Step 01</span>
+          <div class="flow-name">Website Form</div>
+          <div class="flow-desc">Custom-built contact form captures name, email, phone, and car interest</div>
+          <div class="flow-status"><span class="sdot"></span><span class="stext">Live</span></div>
+        </div>
+
+        <div class="flow-connector" data-connector>
+          <svg viewBox="0 0 36 14"><line class="connector-line" x1="0" y1="7" x2="29" y2="7"/><polygon class="connector-head" points="25,3 36,7 25,11"/></svg>
+        </div>
+
+        <div class="flow-node" data-node>
+          <svg class="flow-icon" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.2">
+            <path d="M22 8v6M22 30v6M8 22h6M30 22h6"/>
+            <circle cx="22" cy="22" r="10"/>
+            <circle cx="22" cy="22" r="3.5" fill="currentColor" stroke="none"/>
+            <path d="M28.5 15.5l-4.2 4.2M15.5 28.5l4.2-4.2" stroke-width="1"/>
+          </svg>
+          <span class="flow-step">Step 02</span>
+          <div class="flow-name">n8n Webhook</div>
+          <div class="flow-desc">Instant trigger receives the submission and orchestrates every downstream action</div>
+          <div class="flow-status"><span class="sdot"></span><span class="stext">Live</span></div>
+        </div>
+
+        <div class="flow-connector" data-connector>
+          <svg viewBox="0 0 36 14"><line class="connector-line" x1="0" y1="7" x2="29" y2="7"/><polygon class="connector-head" points="25,3 36,7 25,11"/></svg>
+        </div>
+
+        <div class="flow-node" data-node>
+          <svg class="flow-icon" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.2">
+            <circle cx="22" cy="16" r="7"/>
+            <path d="M8 36c0-7.732 6.268-14 14-14s14 6.268 14 14"/>
+            <path d="M28 24l4-3 4 3"/>
+          </svg>
+          <span class="flow-step">Step 03</span>
+          <div class="flow-name">HubSpot CRM</div>
+          <div class="flow-desc">Contact and deal created automatically. Car interest logged. Pipeline updated</div>
+          <div class="flow-status"><span class="sdot"></span><span class="stext">Live</span></div>
+        </div>
+
+        <div class="flow-connector" data-connector>
+          <svg viewBox="0 0 36 14"><line class="connector-line" x1="0" y1="7" x2="29" y2="7"/><polygon class="connector-head" points="25,3 36,7 25,11"/></svg>
+        </div>
+
+        <div class="flow-node" data-node>
+          <svg class="flow-icon" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.2">
+            <rect x="7" y="11" width="30" height="22" rx="2"/>
+            <path d="M7 15l15 11 15-11"/>
+          </svg>
+          <span class="flow-step">Step 04</span>
+          <div class="flow-name">Gmail Alert</div>
+          <div class="flow-desc">Branded notification with full lead summary delivered in under 1.5 seconds</div>
+          <div class="flow-status"><span class="sdot"></span><span class="stext">Live</span></div>
+        </div>
+
+        <div class="flow-connector" data-connector>
+          <svg viewBox="0 0 36 14"><line class="connector-line" x1="0" y1="7" x2="29" y2="7"/><polygon class="connector-head" points="25,3 36,7 25,11"/></svg>
+        </div>
+
+        <div class="flow-node" data-node>
+          <svg class="flow-icon" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.2">
+            <circle cx="22" cy="22" r="14"/>
+            <path d="M15 20.5c0-3.866 3.134-7 7-7s7 3.134 7 7c0 2.5-1.3 4.7-3.25 6l1 4.5H17.25l1-4.5C16.3 25.2 15 23 15 20.5z"/>
+            <path d="M19 28.5h6" stroke-width="1"/>
+          </svg>
+          <span class="flow-step">Step 05</span>
+          <div class="flow-name">AI Concierge</div>
+          <div class="flow-desc">Claude-powered Telegram bot answers client questions 24/7 and escalates warm leads</div>
+          <div class="flow-status"><span class="sdot"></span><span class="stext">Live</span></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- WHAT WAS BUILT -->
+  <div>
+    <div class="section-wrap">
+      <span class="section-label reveal">03 / Deliverables</span>
+      <h2 class="section-heading reveal d1">What was built</h2>
+      <div class="built-grid">
+
+        <div class="built-card reveal">
+          <span class="built-badge live">Live</span>
+          <svg class="built-icon" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.2">
+            <rect x="5" y="7" width="34" height="26" rx="2"/>
+            <path d="M5 14h34M12 20h8M12 24.5h12M12 29h6"/>
+            <path d="M5 33l10-8M39 33l-10-8" stroke-width="0.8" stroke-dasharray="2 2"/>
+          </svg>
+          <div class="built-title">Bespoke Website</div>
+          <div class="built-desc">Hand-crafted luxury landing page with inventory showcase, video hero, animated reveals, contact form, and a floating Telegram chat button. Built to match the discretion and elegance of the AMH brand exactly.</div>
+          <div class="built-tech">
+            <span class="ttag">HTML</span><span class="ttag">CSS</span>
+            <span class="ttag">JavaScript</span><span class="ttag">Vercel</span>
+          </div>
+        </div>
+
+        <div class="built-card reveal d1">
+          <span class="built-badge live">Live</span>
+          <svg class="built-icon" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.2">
+            <rect x="8" y="8" width="12" height="12" rx="1.5"/>
+            <rect x="24" y="8" width="12" height="12" rx="1.5"/>
+            <rect x="8" y="24" width="12" height="12" rx="1.5"/>
+            <rect x="24" y="24" width="12" height="12" rx="1.5"/>
+            <path d="M20 14h4M20 30h4M14 20v4M30 20v4"/>
+          </svg>
+          <div class="built-title">Lead Capture Automation</div>
+          <div class="built-desc">n8n workflow that catches every form submission, creates a full HubSpot contact and deal with car-interest data, fires a branded Gmail notification, and closes the webhook — all in under 2 seconds.</div>
+          <div class="built-tech">
+            <span class="ttag">n8n</span><span class="ttag">Webhook</span>
+            <span class="ttag">HubSpot API</span><span class="ttag">Gmail API</span>
+          </div>
+        </div>
+
+        <div class="built-card reveal d2">
+          <span class="built-badge live">Live</span>
+          <svg class="built-icon" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.2">
+            <path d="M8 36V20l14-10 14 10v16"/>
+            <path d="M16 36V26h12v10"/>
+            <path d="M22 16v5M18 26h8"/>
+          </svg>
+          <div class="built-title">HubSpot CRM Pipeline</div>
+          <div class="built-desc">Full CRM setup with custom deal stages, contact properties for car interest, inquiry notes, and a structured sales pipeline. Every enquiry is traceable from first contact to closed deal.</div>
+          <div class="built-tech">
+            <span class="ttag">HubSpot</span><span class="ttag">Deal Stages</span>
+            <span class="ttag">Properties</span><span class="ttag">Pipeline</span>
+          </div>
+        </div>
+
+        <div class="built-card reveal d3">
+          <span class="built-badge live">Live</span>
+          <svg class="built-icon" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.2">
+            <circle cx="22" cy="22" r="14"/>
+            <path d="M16 22l4 4 9-9" stroke-width="1.5"/>
+            <path d="M22 8v3M22 33v3M8 22h3M33 22h3"/>
+          </svg>
+          <div class="built-title">AI Concierge Bot</div>
+          <div class="built-desc">Claude-powered Telegram bot trained in the AMH brand voice. Handles collector car questions with elegance, captures buyer intent, and escalates high-value leads to the owner in real time via a separate notification bot.</div>
+          <div class="built-tech">
+            <span class="ttag">Claude AI</span><span class="ttag">Telegram</span>
+            <span class="ttag">n8n</span><span class="ttag">Escalation Logic</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="results-bg">
+    <div class="section-wrap">
+      <span class="section-label reveal">04 / Results</span>
+      <h2 class="section-heading reveal d1">The system in numbers</h2>
+      <div class="results-grid">
+        <div class="stat-block reveal">
+          <div class="stat-num">
+            <span class="scount" data-target="100">0</span><span class="stat-suffix">%</span>
+          </div>
+          <span class="stat-lbl">Leads captured</span>
+        </div>
+        <div class="stat-block reveal d1">
+          <div class="stat-num">
+            <span class="scount" data-target="0">0</span>
+          </div>
+          <span class="stat-lbl">Manual data entry</span>
+        </div>
+        <div class="stat-block reveal d2">
+          <div class="stat-num">
+            <span class="stat-prefix">&lt;</span><span class="scount" data-target="2">0</span><span class="stat-suffix">s</span>
+          </div>
+          <span class="stat-lbl">Form to CRM</span>
+        </div>
+        <div class="stat-block reveal d3">
+          <div class="stat-num">
+            <span class="scount" data-target="24">0</span><span class="stat-suffix">/7</span>
+          </div>
+          <span class="stat-lbl">AI bot response</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIMELINE -->
+  <div>
+    <div class="section-wrap" style="max-width:900px;">
+      <span class="section-label reveal">05 / The Journey</span>
+      <h2 class="section-heading reveal d1">What happens when a client hits "Send"</h2>
+      <div class="timeline">
+        <div class="tl-item reveal">
+          <div class="tl-dot"></div>
+          <div class="tl-step">00:00.000</div>
+          <div class="tl-title">Form submitted</div>
+          <div class="tl-body">The prospect enters their name, email, and the car they're interested in. They hit Send. Nothing visible changes — but the pipeline is already running.</div>
+        </div>
+        <div class="tl-item reveal d1">
+          <div class="tl-dot"></div>
+          <div class="tl-step">00:00.180</div>
+          <div class="tl-title">n8n webhook fires</div>
+          <div class="tl-body">The form data hits the n8n webhook in under 200ms. The workflow validates and routes every field to every connected system simultaneously.</div>
+        </div>
+        <div class="tl-item reveal d2">
+          <div class="tl-dot"></div>
+          <div class="tl-step">00:00.900</div>
+          <div class="tl-title">HubSpot contact created</div>
+          <div class="tl-body">A full contact record lands in HubSpot — name, email, phone, car interest, and a timestamped inquiry note. A deal opens at "New Lead" stage in the pipeline.</div>
+        </div>
+        <div class="tl-item reveal d3">
+          <div class="tl-dot"></div>
+          <div class="tl-step">00:01.400</div>
+          <div class="tl-title">Owner notified</div>
+          <div class="tl-body">A branded Gmail notification arrives with the full lead summary, the specific car they enquired about, and a direct link to the HubSpot record. Response time: under 1.5 seconds.</div>
+        </div>
+        <div class="tl-item reveal" style="padding-bottom:0;">
+          <div class="tl-dot"></div>
+          <div class="tl-step">Ongoing</div>
+          <div class="tl-title">AI concierge handles the conversation</div>
+          <div class="tl-body">If the client messages the Telegram bot, the Claude-powered concierge responds instantly — in AMH brand voice, with real product knowledge — 24 hours a day. High-intent buyers are escalated to the owner immediately, with full context.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-bg">
+    <div class="section-wrap">
+      <div class="cta-inner">
+        <span class="cta-eyebrow reveal">Want this for your business?</span>
+        <h2 class="cta-heading reveal d1">Let's build your automation stack</h2>
+        <p class="cta-sub reveal d2">I design and build end-to-end automation systems for service businesses — lead capture, CRM setup, AI-powered bots, email sequences, and more. No templates. Built to fit your exact workflow.</p>
+        <div class="cta-btns reveal d3">
+          <!-- Update this Upwork URL with your profile link -->
+          <a href="https://www.upwork.com/freelancers/hannafitin" target="_blank" rel="noopener" class="btn-primary">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M13 2H3a1 1 0 00-1 1v10a1 1 0 001 1h10a1 1 0 001-1V3a1 1 0 00-1-1zM8 11a3 3 0 110-6 3 3 0 010 6z"/></svg>
+            Hire me on Upwork
+          </a>
+          <a href="mailto:hannafitin@gmail.com" class="btn-outline">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="10" rx="1"/><path d="M2 5l6 4.5L14 5"/></svg>
+            hannafitin@gmail.com
+          </a>
+        </div>
+        <p class="cta-note reveal d4">Based in Portugal · Working worldwide · n8n · Claude AI · HubSpot</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <span class="footer-copy">Atlantic Motor Heritage — Case Study · Hanna Fitin Automation</span>
+    <a href="index.html" class="footer-link">← Atlantic Motor Heritage</a>
+  </footer>
+
+  <script>
+    // Nav scroll
+    const nav = document.getElementById('mainNav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 50);
+    }, { passive: true });
+
+    // Generic reveal
+    const revObs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('in'); revObs.unobserve(e.target); }
+      });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach(el => revObs.observe(el));
+
+    // Flow diagram — staggered node + connector animation
+    const flowObs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (!e.isIntersecting) return;
+        const nodes = document.querySelectorAll('[data-node]');
+        const connectors = document.querySelectorAll('[data-connector]');
+        nodes.forEach((node, i) => {
+          setTimeout(() => node.classList.add('flow-in'), i * 200);
+        });
+        connectors.forEach((c, i) => {
+          setTimeout(() => {
+            c.querySelector('.connector-line').classList.add('line-in');
+          }, i * 200 + 130);
+        });
+        flowObs.unobserve(e.target);
+      });
+    }, { threshold: 0.15 });
+    const ft = document.getElementById('flowTrack');
+    if (ft) flowObs.observe(ft);
+
+    // Stat counters
+    function countUp(el) {
+      const target = parseInt(el.dataset.target, 10);
+      if (target === 0) return;
+      const duration = 1600;
+      const start = performance.now();
+      (function tick(now) {
+        const t = Math.min((now - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - t, 3);
+        el.textContent = Math.round(eased * target);
+        if (t < 1) requestAnimationFrame(tick);
+      })(start);
+    }
+    const statObs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.querySelectorAll('.scount').forEach(countUp);
+          statObs.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.45 });
+    document.querySelectorAll('.stat-block').forEach(el => statObs.observe(el));
+  </script>
+
+</body>
+</html>
