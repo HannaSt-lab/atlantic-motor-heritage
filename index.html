@@ -901,5 +901,61 @@
     }, { threshold: 0.08 });
     document.querySelectorAll('[data-reveal]').forEach(el => cardObs.observe(el));
   </script>
+
+  <!-- Floating Telegram Button -->
+  <style>
+    .tg-float {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #0F2A1F;
+      border: 1px solid rgba(184,147,90,0.45);
+      color: #B8935A;
+      text-decoration: none;
+      padding: 13px 20px 13px 16px;
+      border-radius: 3px;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: opacity 0.6s ease, transform 0.6s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.45), 0 1px 0 rgba(184,147,90,0.08) inset;
+    }
+    .tg-float.visible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+    .tg-float:hover {
+      border-color: rgba(184,147,90,0.85);
+      box-shadow: 0 6px 32px rgba(0,0,0,0.55), 0 0 18px rgba(184,147,90,0.12);
+      transform: translateY(-2px);
+    }
+    .tg-float svg {
+      width: 18px;
+      height: 18px;
+      fill: #B8935A;
+      flex-shrink: 0;
+    }
+  </style>
+
+  <a class="tg-float" href="https://t.me/AtlanticMotor_bot" target="_blank" rel="noopener" id="tgFloat">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+    </svg>
+    Chat with us
+  </a>
+
+  <script>
+    setTimeout(() => { document.getElementById('tgFloat').classList.add('visible'); }, 3000);
+  </script>
 </body>
 </html>
