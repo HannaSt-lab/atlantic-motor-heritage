@@ -249,6 +249,143 @@
       .footer { flex-direction: column; gap: 1rem; text-align: center; padding: 1.75rem 1.5rem; }
       .footer-links { justify-content: center; }
     }
+
+    /* ═══ HERO REDESIGN ═══════════════════════════════ */
+    .hero { align-items: flex-start !important; justify-content: center; padding: 0 3.5rem !important; padding-top: 8rem !important; padding-bottom: 5rem !important; }
+    .hero-inner { max-width: none !important; }
+    .hero-title { font-size: clamp(4rem, 8.5vw, 8.5rem) !important; }
+    .hero-grid {
+      position: absolute; inset: 0; pointer-events: none; z-index: 0;
+      background-image: radial-gradient(circle, rgba(184,147,90,0.1) 1px, transparent 1px);
+      background-size: 44px 44px;
+      -webkit-mask-image: radial-gradient(ellipse 95% 95% at 50% 50%, black 20%, transparent 100%);
+      mask-image: radial-gradient(ellipse 95% 95% at 50% 50%, black 20%, transparent 100%);
+    }
+    .sys-bar {
+      position: absolute; top: 72px; left: 0; right: 0; z-index: 2;
+      padding: 0.55rem 3.5rem;
+      border-bottom: 1px solid rgba(184,147,90,0.1);
+      background: rgba(10,26,18,0.55);
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      opacity: 0; animation: up 0.7s ease 0.15s forwards;
+    }
+    .sys-bar-inner {
+      display: flex; align-items: center; gap: 1.4rem; flex-wrap: wrap;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.57rem; letter-spacing: 0.14em; text-transform: uppercase;
+      color: rgba(184,147,90,0.5);
+    }
+    .sys-status { display: flex; align-items: center; gap: 0.4rem; color: #4ade80; font-weight: 500; }
+    .sys-dot {
+      width: 6px; height: 6px; border-radius: 50%; background: #4ade80; flex-shrink: 0;
+      animation: syspulse 1.8s ease-in-out infinite;
+    }
+    @keyframes syspulse {
+      0%,100% { box-shadow: 0 0 0 0 rgba(74,222,128,0.5); }
+      50% { box-shadow: 0 0 0 5px rgba(74,222,128,0); }
+    }
+    .sys-sep { opacity: 0.2; }
+    .sys-val { color: var(--gold); }
+    .hero-layout {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 5rem;
+      align-items: center; width: 100%; position: relative; z-index: 1;
+    }
+    .pipeline { display: flex; align-items: center; margin-top: 2.5rem; }
+    .pipe-node {
+      flex-shrink: 0; text-align: center;
+      background: rgba(22,22,22,0.92);
+      border: 1px solid rgba(184,147,90,0.15);
+      padding: 0.68rem 0.8rem;
+      transition: border-color 0.35s, box-shadow 0.35s, background 0.35s;
+    }
+    .pipe-node.firing {
+      border-color: rgba(184,147,90,0.65) !important;
+      background: rgba(184,147,90,0.08) !important;
+      box-shadow: 0 0 24px rgba(184,147,90,0.15) !important;
+    }
+    .pipe-node-icon {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.58rem; font-weight: 600;
+      color: var(--gold); letter-spacing: 0.1em; text-transform: uppercase;
+      margin-bottom: 0.2rem;
+    }
+    .pipe-node-name {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.46rem; letter-spacing: 0.06em; text-transform: uppercase;
+      color: rgba(244,241,232,0.6); line-height: 1.4;
+    }
+    .pipe-live {
+      display: flex; align-items: center; justify-content: center; gap: 0.25rem;
+      margin-top: 0.28rem;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.42rem; letter-spacing: 0.1em; color: #4ade80;
+    }
+    .live-dot {
+      width: 4px; height: 4px; border-radius: 50%;
+      background: #4ade80; flex-shrink: 0;
+      animation: syspulse 1.8s ease-in-out infinite;
+    }
+    .pipe-connector {
+      flex: 1; height: 1px; background: rgba(184,147,90,0.12);
+      position: relative; overflow: hidden; min-width: 12px;
+    }
+    .pipe-stream {
+      position: absolute; top: -1px;
+      width: 28px; height: 3px; border-radius: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      animation: flow 2.5s linear infinite;
+    }
+    @keyframes flow {
+      from { left: -28px; opacity: 0; }
+      15% { opacity: 1; } 85% { opacity: 1; }
+      to { left: 100%; opacity: 0; }
+    }
+    .terminal-wrap {
+      opacity: 0; transform: translateY(28px);
+      animation: up 1s cubic-bezier(0.22,1,0.36,1) 0.9s forwards;
+    }
+    .terminal {
+      background: #080808;
+      border: 1px solid rgba(184,147,90,0.22);
+      border-radius: 10px; overflow: hidden;
+      box-shadow: 0 0 0 1px rgba(184,147,90,0.05), 0 28px 70px rgba(0,0,0,0.75), 0 60px 130px rgba(0,0,0,0.45);
+    }
+    .t-header {
+      background: #0f0f0f;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      padding: 0.72rem 1.1rem;
+      display: flex; align-items: center; gap: 0.75rem;
+    }
+    .t-dots { display: flex; gap: 0.42rem; }
+    .t-dots span { width: 11px; height: 11px; border-radius: 50%; }
+    .t-dots span:nth-child(1) { background: #ff5f57; }
+    .t-dots span:nth-child(2) { background: #febc2e; }
+    .t-dots span:nth-child(3) { background: #28c840; }
+    .t-title { font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; letter-spacing: 0.07em; color: rgba(255,255,255,0.22); }
+    .t-body {
+      padding: 1.25rem 1.25rem 1.75rem;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.63rem; line-height: 2; min-height: 300px;
+    }
+    .t-row { display: flex; gap: 1rem; opacity: 0; animation: tfade 0.15s ease forwards; }
+    @keyframes tfade { to { opacity: 1; } }
+    .t-ts { color: rgba(184,147,90,0.3); flex-shrink: 0; }
+    .t-msg { color: rgba(244,241,232,0.65); }
+    .t-msg.ok { color: #4ade80; }
+    .t-msg.gold { color: var(--gold); }
+    .t-msg.dim { color: rgba(244,241,232,0.25); }
+    .t-cursor {
+      display: inline-block; width: 8px; height: 14px;
+      background: rgba(184,147,90,0.65);
+      animation: blink 1s step-end infinite;
+      vertical-align: middle; margin-left: 2px; border-radius: 1px;
+    }
+    @media (max-width: 960px) {
+      .hero-layout { grid-template-columns: 1fr !important; gap: 3rem; }
+      .terminal-wrap { display: none; }
+      .sys-bar { padding: 0.5rem 1.5rem; }
+      .sys-bar-inner { gap: 0.8rem; }
+    }
   </style>
 </head>
 <body>
@@ -270,18 +407,73 @@
 
   <!-- HERO -->
   <section class="hero">
+    <div class="hero-grid"></div>
+    <div class="sys-bar">
+      <div class="sys-bar-inner">
+        <span class="sys-status"><span class="sys-dot"></span>System Live</span>
+        <span class="sys-sep">·</span>
+        <span>5 Nodes Active</span>
+        <span class="sys-sep">·</span>
+        <span>Execution <span class="sys-val">&lt;2s</span></span>
+        <span class="sys-sep">·</span>
+        <span>Uptime <span class="sys-val">24/7</span></span>
+        <span class="sys-sep">·</span>
+        <span>Capture Rate <span class="sys-val">100%</span></span>
+      </div>
+    </div>
     <div class="hero-num">AMH</div>
-    <div class="hero-inner">
-      <span class="hero-eyebrow">⚙️ Automation System for Lead Capture & Sales</span>
-      <h1 class="hero-title">Every<br>deliverable.<br>Live.</h1>
-      <div class="hero-rule"></div>
-      <p class="hero-sub">This project demonstrates a system that captures leads, sends them to CRM, notifies the owner, and responds automatically using AI.</p>
-      <div style="margin-top:1.75rem;opacity:0;transform:translateY(10px);animation:up 0.9s cubic-bezier(0.22,1,0.36,1) 1s forwards;">
-        <p style="font-family:'IBM Plex Mono',monospace;font-size:0.72rem;letter-spacing:0.1em;color:rgba(184,147,90,0.8);">Website → n8n → HubSpot → Slack → Telegram AI</p>
+    <div class="hero-layout">
+      <div class="hero-inner">
+        <span class="hero-eyebrow">Automation System / AMH 2026</span>
+        <h1 class="hero-title">Lead.<br><em>Captured.</em><br>Closed.</h1>
+        <div class="hero-rule"></div>
+        <p class="hero-sub">Website form → n8n → HubSpot → Gmail → Telegram AI. Five tools. One pipeline. Zero manual steps.</p>
+        <div class="pipeline" id="pipeline">
+          <div class="pipe-node" data-pipe="0">
+            <div class="pipe-node-icon">FORM</div>
+            <div class="pipe-node-name">Website</div>
+            <div class="pipe-live"><span class="live-dot"></span>LIVE</div>
+          </div>
+          <div class="pipe-connector"><div class="pipe-stream"></div></div>
+          <div class="pipe-node" data-pipe="1">
+            <div class="pipe-node-icon">n8n</div>
+            <div class="pipe-node-name">Webhook</div>
+            <div class="pipe-live"><span class="live-dot"></span>LIVE</div>
+          </div>
+          <div class="pipe-connector"><div class="pipe-stream"></div></div>
+          <div class="pipe-node" data-pipe="2">
+            <div class="pipe-node-icon">CRM</div>
+            <div class="pipe-node-name">HubSpot</div>
+            <div class="pipe-live"><span class="live-dot"></span>LIVE</div>
+          </div>
+          <div class="pipe-connector"><div class="pipe-stream"></div></div>
+          <div class="pipe-node" data-pipe="3">
+            <div class="pipe-node-icon">MAIL</div>
+            <div class="pipe-node-name">Gmail<br>+ Slack</div>
+            <div class="pipe-live"><span class="live-dot"></span>LIVE</div>
+          </div>
+          <div class="pipe-connector"><div class="pipe-stream"></div></div>
+          <div class="pipe-node" data-pipe="4">
+            <div class="pipe-node-icon">AI</div>
+            <div class="pipe-node-name">Telegram<br>Bot</div>
+            <div class="pipe-live"><span class="live-dot"></span>LIVE</div>
+          </div>
+        </div>
+      </div>
+      <div class="terminal-wrap">
+        <div class="terminal">
+          <div class="t-header">
+            <div class="t-dots"><span></span><span></span><span></span></div>
+            <span class="t-title">amh-automation · live execution log</span>
+          </div>
+          <div class="t-body" id="termBody">
+            <span class="t-cursor"></span>
+          </div>
+        </div>
       </div>
     </div>
     <div class="scroll-hint">
-      <span>Scroll</span>
+      <span>Scroll to see every deliverable</span>
       <div class="scroll-hint-line"></div>
     </div>
   </section>
@@ -503,6 +695,47 @@
       });
     }, { threshold: 0.08 });
     document.querySelectorAll('[data-shot]').forEach(el => shotObs.observe(el));
+
+    // ── Live terminal animation ─────────────────────────────
+    const termBody = document.getElementById('termBody');
+    const pipeNodes = document.querySelectorAll('[data-pipe]');
+    const sequence = [
+      { delay: 0,    time: '14:32:01', text: '$ amh-lead-capture  started', cls: 'dim' },
+      { delay: 450,  time: '14:32:01', text: '→ Webhook payload received', cls: '' },
+      { delay: 850,  time: '14:32:01', text: '→ Validating form fields...', cls: 'dim', node: 0 },
+      { delay: 1250, time: '14:32:02', text: '→ n8n workflow triggered', cls: '', node: 1 },
+      { delay: 1650, time: '14:32:02', text: '→ HubSpot contact created', cls: '', node: 2 },
+      { delay: 2000, time: '14:32:02', text: '→ Deal: "Porsche 911 Targa"', cls: 'gold', node: 2 },
+      { delay: 2450, time: '14:32:03', text: '→ Gmail notification sent', cls: '', node: 3 },
+      { delay: 2800, time: '14:32:03', text: '→ Slack alert dispatched', cls: '', node: 3 },
+      { delay: 3200, time: '14:32:04', text: '→ Telegram AI responding...', cls: '', node: 4 },
+      { delay: 3700, time: '14:32:04', text: '✓ Complete  1.8s  all systems OK', cls: 'ok' },
+      { delay: 4100, time: '14:32:04', text: '─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─', cls: 'dim' },
+    ];
+    function runTerminal() {
+      if (!termBody) return;
+      termBody.innerHTML = '<span class="t-cursor"></span>';
+      pipeNodes.forEach(n => n.classList.remove('firing'));
+      sequence.forEach(item => {
+        setTimeout(() => {
+          const cursor = termBody.querySelector('.t-cursor');
+          if (cursor) cursor.remove();
+          if (item.node !== undefined) {
+            pipeNodes.forEach(n => n.classList.remove('firing'));
+            pipeNodes[item.node].classList.add('firing');
+          }
+          const row = document.createElement('div');
+          row.className = 't-row';
+          row.innerHTML = `<span class="t-ts">${item.time}</span><span class="t-msg ${item.cls}">${item.text}</span>`;
+          termBody.appendChild(row);
+          const cur = document.createElement('span');
+          cur.className = 't-cursor';
+          termBody.appendChild(cur);
+        }, item.delay);
+      });
+      setTimeout(runTerminal, sequence[sequence.length - 1].delay + 4500);
+    }
+    setTimeout(runTerminal, 1400);
   </script>
 
 </body>
